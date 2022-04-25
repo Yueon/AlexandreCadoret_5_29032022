@@ -15,8 +15,8 @@ export function getProducts(){
   }
 
 
-  export function getProduct(id){
-    return fetch(`${url}/${id}`)
+  export function getProduct(urlId){
+    return fetch(`${url}/${urlId}`)
     .then(function(res){
       if (res.ok) {
         return res.json();
