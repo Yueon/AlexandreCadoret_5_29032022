@@ -1,7 +1,6 @@
 import { getProduct } from "./api.js";
 
 console.log("window Location:", window.location);
-
 let product
 //On récupère l'ID du produit
 const paramsUrl = new URLSearchParams(window.location.search)
@@ -30,22 +29,11 @@ function createElements(product){
     //On implémente les options
     const optionHtml = document.getElementById('colors');
       product.colors.forEach(function(options){
-        console.log('colors :', options)
       optionHtml.innerHTML += `<option value="${options}">${options}</option>`
       })
 }
 
-
-/* 1-sur clic de ajout au panier save les données (id,couleur,nombre) dans un array en localstorage
-    2- si ont ajoute un canap qui n'était pas dans le array (même id + même couleur) 
-    on rajoute l'élément, sinon on incrémente juste la quantité du produit correspondant.
-
-      1-créer fonction event click
-      2-créer object (id, couleur, nombre)
-      3-créer fonction ajout object dans localstorage
-      4-créer fonction if,else check localstorage
-    */
-
+    //on récupère les produits sélectionner par l'utilisateur
 
     document
         .getElementById('addToCart')
@@ -57,21 +45,97 @@ function createElements(product){
           console.log('quantité choisie :', optionQuantity)
 
           if(optionQuantity > 0 && optionColor.length > 0) {
-            console.log('produit ajouté au panier')
           }else {
             console.log('quantité non sélectionné')
           }
+        
+          //on place les valeurs dans un objet
 
           let objectProduct = {
             id: product._id,
             colors: optionColor,
-            Number: optionQuantity,
+            number: optionQuantity,
+            name : product.name,
+            price: product.price,
+            totalPrice: product.price * optionQuantity,
+            imageUrl: product.imageUrl,
+            imageAlt: product.altTxt,
           }
-          console.log('produit ajouté au panier :', objectProduct);
-});
+          console.log('produit ajouté au panier :', objectProduct)
+          
+let produitSaveLocalStorage = JSON.parse(localStorage.getItem("produits"));
+
+const ajoutProduitLocalStorage = function(){
+  produitSaveLocalStorage.push(objectProduct);
+  localStorage.setItem("produits", JSON.stringify(produitSaveLocalStorage));
+}
+
+if(produitSaveLocalStorage){
+  ajoutProduitLocalStorage();
+}else {
+  produitSaveLocalStorage = [];
+  ajoutProduitLocalStorage();
+}
+        
+
+/*const ajoutAuPanier = addPanier(objectProduct)
+
+function savePanier(panier){
+  localStorage.setItem("produits", JSON.stringify(objectProduct));
+  }
+        
+function getPanier(){
+  let panier = localStorage.getItem("produits");
+    if(panier == null){
+      return [];
+    }else{
+      return console.log('oui'), JSON.parse(panier);
+      }
+    }
+        
+function addPanier(objectProduct){
+  let panier = getPanier();
+  let foundProduct = panier.findIndex((item) => item.produit._id === product._id && item.produit.colors === optionColor);
+    if(foundProduct > -1) {
+      foundProduct++;
+      console.log('quantité')
+    }else{
+      panier.push(objectProduct);
+      console.log('quantité non')
+     }
+    savePanier(panier);
+}*/
+
+/*function removeFromPanier(objectProduct){
+  let panier = getPanier();
+  panier = panier.filter(p => p.id != objectProduct.id);
+  savePanier(objectProduct);
+}*/
+
+/*function changeQuantity(objectProduct, quantity){
+  let panier = getPanier();
+  let foundProduct = panier.find(p => p.id == objectProduct.id);
+    if(foundProduct != undefined){      
+        foundProduct.quantity += quantity;
+        if (foundProduct.quantity <= 0) {
+          removeFromPanier(foundProduct);
+        } else {
+        savePanier(objectProduct);
+    }
+  }
+}*/
+        }
+);
+
+
+
+
+
+
+
 
 /*
-const i = cart.findIndex((item) => item.productId === productId && item.productColor === productColor)
+const i = cart.findIndex((item) => item.product._id === product._id && item.optionColor === optionColor)
 
 if(i > -1) {
   console.log("Déjà dans le panier, ajustement")
