@@ -1,0 +1,1 @@
+// mettre les fonctions utiliser sûr plusieurs pages

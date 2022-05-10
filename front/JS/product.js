@@ -62,26 +62,12 @@ function createElements(product){
             imageAlt: product.altTxt,
           }
           console.log('produit ajouté au panier :', objectProduct)
-          
-let produitSaveLocalStorage = JSON.parse(localStorage.getItem("produits"));
 
-const ajoutProduitLocalStorage = function(){
-  produitSaveLocalStorage.push(objectProduct);
-  localStorage.setItem("produits", JSON.stringify(produitSaveLocalStorage));
-}
 
-if(produitSaveLocalStorage){
-  ajoutProduitLocalStorage();
-}else {
-  produitSaveLocalStorage = [];
-  ajoutProduitLocalStorage();
-}
-        
-
-/*const ajoutAuPanier = addPanier(objectProduct)
+const ajoutAuPanier = addPanier(objectProduct)
 
 function savePanier(panier){
-  localStorage.setItem("produits", JSON.stringify(objectProduct));
+  localStorage.setItem("produits", JSON.stringify(panier));
   }
         
 function getPanier(){
@@ -89,41 +75,27 @@ function getPanier(){
     if(panier == null){
       return [];
     }else{
-      return console.log('oui'), JSON.parse(panier);
+      console.log('Il y a déjà des produits dans le localStrorage')
+      return JSON.parse(panier);
       }
     }
         
 function addPanier(objectProduct){
   let panier = getPanier();
-  let foundProduct = panier.findIndex((item) => item.produit._id === product._id && item.produit.colors === optionColor);
+  panier = [].concat(panier);
+  console.log(panier);
+  let foundProduct = panier.findIndex((item) => item.id === objectProduct.id && item.colors === objectProduct.colors);
     if(foundProduct > -1) {
-      foundProduct++;
-      console.log('quantité')
+      console.log('id du produit', foundProduct)
+      panier[foundProduct].number = parseInt(panier[foundProduct].number) + parseInt(objectProduct.number);
+      console.log("quantite ajouté", objectProduct.number)
+      console.log("quantite total", panier[foundProduct].number)
     }else{
       panier.push(objectProduct);
-      console.log('quantité non')
+      console.log("nouveau produit", panier)
      }
     savePanier(panier);
-}*/
-
-/*function removeFromPanier(objectProduct){
-  let panier = getPanier();
-  panier = panier.filter(p => p.id != objectProduct.id);
-  savePanier(objectProduct);
-}*/
-
-/*function changeQuantity(objectProduct, quantity){
-  let panier = getPanier();
-  let foundProduct = panier.find(p => p.id == objectProduct.id);
-    if(foundProduct != undefined){      
-        foundProduct.quantity += quantity;
-        if (foundProduct.quantity <= 0) {
-          removeFromPanier(foundProduct);
-        } else {
-        savePanier(objectProduct);
-    }
-  }
-}*/
+}
         }
 );
 

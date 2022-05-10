@@ -1,3 +1,5 @@
+
+
 const htmlPanier = document.getElementById("cart__items")
 
 // on récupère les donnés du localstorage
@@ -13,7 +15,7 @@ function createElements(panier){
     
     for(let product of panier)
     htmlPanier.innerHTML += 
-    `<article class="cart__item" data-id="${product._id}" data-color="${product.colors}">
+    `<article class="cart__item" data-id="${product.id}" data-color="${product.colors}">
         <div class="cart__item__img">
             <img src="${product.imageUrl}" alt="${product.altTxt}">
         </div>
@@ -29,7 +31,7 @@ function createElements(panier){
                     <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${product.number}">
                 </div>
                 <div class="cart__item__content__settings__delete">
-                    <p class="deleteItem">Supprimer</p>
+                    <p class="deleteItem" >Supprimer</p>
                 </div>
             </div>
         </div>
@@ -48,7 +50,7 @@ let totalQuantity = [];
 //on créé une boucle pour ajouter chaque prix/quantité au tableau
 for ( let product of panier){
     totalPanier.push(product.totalPrice)
-    totalQuantity.push(product.number * 1)
+    totalQuantity.push(parseInt(product.number))
 };
 console.log('Prix Total', totalPanier);
 console.log('Quantite Total', totalQuantity);
@@ -73,9 +75,58 @@ htmlTotalPanierPrice.innerHTML += `${totalPrice}`;
 htmlTotalPanierQuantity.innerHTML += `${quantityTotal}`;
 
 
-const htmlBouttonSupprimer = document.querySelector('.deleteItem');
-        htmlBouttonSupprimer.addEventListener('click', function(e) {
-            e.preventDefault()
-            localStorage.removeItem("produits")
-            window.location.reload()
+const htmlBouttonSupprimer = document.querySelectorAll('.deleteItem');
+console.log("bouton supprimer", htmlBouttonSupprimer)
+htmlBouttonSupprimer.forEach(bouton => {
+        bouton.addEventListener("click", function(e) {
+        e.preventDefault()
+        console.log("event e",e)
+        const produitEl = e.target.closest("article.cart__item");
+        console.log("element du boutton", produitEl)
+        removeFromPanier(produitEl);
+        window.location.reload()
+           });        
 });
+
+function removeFromPanier(produitEl){
+    let panier = getPanier();
+    let index = panier.filter(p => p.id == produitEl.dataset.id && p.colors == produitEl.dataset.color);
+    console.log("couleur de l'element",produitEl.dataset.color)
+    console.log("contenue du panier",panier)
+    panier.splice(index, 1);
+    localStorage.setItem("produits", JSON.stringify(panier));
+  }
+
+  function getPanier(){
+    let panier = localStorage.getItem("produits");
+      if(panier == null){
+        return [];
+      }else{
+        console.log('Il y a déjà des produits dans le localStrorage')
+        return JSON.parse(panier);
+        }
+      }
+
+
+const changerQuantiter = document.querySelectorAll('.itemQuantity');
+changerQuantiter.forEach(bouton => {
+    bouton.addEventListener("change", function(e) {
+    e.preventDefault()
+    console.log("event e",e)
+    const produitEl = e.target.closest("article.cart__item");
+    console.log("element du boutton", produitEl)
+    changerLaQuantiter(produitEl)
+       });
+
+function changerLaQuantiter(produitEl){
+        let panier = getPanier();
+        let index = panier.filter(p => p.id == produitEl.dataset.id && p.colors == produitEl.dataset.color);
+        console.log("couleur de l'element",produitEl.dataset.color)
+        console.log("contenue du panier",panier)
+        console.log("index",index)
+        [index].number = produitEl.value
+        //remplacer la valeur quantiter du localStorage avec la nouvelle
+
+        //localStorage.setItem("produits", JSON.stringify(panier));
+      }
+    })
