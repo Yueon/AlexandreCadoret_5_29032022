@@ -1,7 +1,9 @@
 import { getProduct } from "./api.js";
+import { savePanier } from "./utils.js";
+import { getPanier } from "./utils.js";
 
-console.log("window Location:", window.location);
 let product
+
 //On récupère l'ID du produit
 const paramsUrl = new URLSearchParams(window.location.search)
   const urlId = paramsUrl.get('id')
@@ -9,7 +11,6 @@ const paramsUrl = new URLSearchParams(window.location.search)
 
 window.onload = async () => {
   product = await getProduct(urlId)
-  console.log(product)
   createElements(product)
 }
 
@@ -35,50 +36,36 @@ function createElements(product){
 
     //on récupère les produits sélectionner par l'utilisateur
 
-    document
-        .getElementById('addToCart')
-        .addEventListener("click", function(Event){
-          console.log(Event)
-          let optionColor = document.getElementById('colors').value
-          console.log('couleur choisie :', optionColor)
-          let optionQuantity = document.getElementById('quantity').value
-          console.log('quantité choisie :', optionQuantity)
+document
+  .getElementById('addToCart')
+  .addEventListener("click", function(Event){
+    let optionColor = document.getElementById('colors').value
+    console.log('couleur choisie :', optionColor)
+    let optionQuantity = document.getElementById('quantity').value
+    console.log('quantité choisie :', optionQuantity)
 
-          if(optionQuantity > 0 && optionColor.length > 0) {
-          }else {
-            console.log('quantité non sélectionné')
-          }
+    if(optionQuantity > 0 && optionColor.length > 0) {
+    }else {
+    console.log('quantité non sélectionné')
+    }
         
-          //on place les valeurs dans un objet
+//on place les valeurs dans un objet
 
-          let objectProduct = {
-            id: product._id,
-            colors: optionColor,
-            number: optionQuantity,
-            name : product.name,
-            price: product.price,
-            totalPrice: product.price * optionQuantity,
-            imageUrl: product.imageUrl,
-            imageAlt: product.altTxt,
-          }
-          console.log('produit ajouté au panier :', objectProduct)
+let objectProduct = {
+  id: product._id,
+  colors: optionColor,
+  number: optionQuantity,
+  name : product.name,
+  price: product.price,
+  totalPrice: product.price * optionQuantity,
+  imageUrl: product.imageUrl,
+  imageAlt: product.altTxt,
+}
+console.log('produit ajouté au panier :', objectProduct)
 
+// On ajoute les produits dans le localStorage
 
 const ajoutAuPanier = addPanier(objectProduct)
-
-function savePanier(panier){
-  localStorage.setItem("produits", JSON.stringify(panier));
-  }
-        
-function getPanier(){
-  let panier = localStorage.getItem("produits");
-    if(panier == null){
-      return [];
-    }else{
-      console.log('Il y a déjà des produits dans le localStrorage')
-      return JSON.parse(panier);
-      }
-    }
         
 function addPanier(objectProduct){
   let panier = getPanier();
@@ -95,25 +82,4 @@ function addPanier(objectProduct){
       console.log("nouveau produit", panier)
      }
     savePanier(panier);
-}
-        }
-);
-
-
-
-
-
-
-
-
-/*
-const i = cart.findIndex((item) => item.product._id === product._id && item.optionColor === optionColor)
-
-if(i > -1) {
-  console.log("Déjà dans le panier, ajustement")
-  } else {
-  console.log("Nouveau produit dans le panier")
-})
-}
-
-*/
+}});
