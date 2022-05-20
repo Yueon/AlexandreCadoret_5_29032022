@@ -13,3 +13,5 @@ export function getPanier(){
         return JSON.parse(panier);
     }
 }
+
+

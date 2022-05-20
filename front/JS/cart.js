@@ -147,26 +147,27 @@ function changerLaQuantiter(produitEl){
 
 let tousLesId = [];
 let totalPrix = [];
+let toutLesProduitAvecPrix = [];
 
 function getPanierId(){
     let panier = getPanier();
     console.log("contenue du panier", panier)
-////////////Boucle qui ne marche pas////////////
-    panier.forEach(produits => {
-        tousLesId.push(produits.id)
-        console.log("Les ID de Tout les produits du panier",produits.id)
-    }); 
-    const trouverProduitDeApi = trouverProduitDansApi();
+////////////Boucle OK////////////
+panier.forEach(produits => {
+    tousLesId.push(produits.id)
+    console.log("Les ID de Tout les produits du panier",tousLesId)
+})
+const trouverProduitDeApi = trouverProduitDansApi();
 };
-        
-function trouverProduitDansApi(tousLesId, produits) {
-    let toutLesProduitAvecPrix = [];
+
+////////////Boucle qui ne marche pas////////////
+function trouverProduitDansApi(products, tousLesId) {
+    console.log("Tout les id test",tousLesId)
     tousLesId.forEach(function(index){  
-    toutLesProduitAvecPrix.push(getProduct(index))
+    toutLesProduitAvecPrix.push(getProducts(index))
 }
 )
 console.log("tous les prix",toutLesProduitAvecPrix)
-}
-        
+};      
 
 const recupererId = getPanierId();
