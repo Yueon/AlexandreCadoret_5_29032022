@@ -45,7 +45,7 @@ function createElements(panier){
     </article>`
 }
 
-////////////////////// Total Panier Prix + Quantite //////////////////////
+////////////////////// Total Quantite //////////////////////
 
 const htmlTotalPanierQuantity = document.getElementById("totalQuantity");
 //const htmlTotalPanierPrice = document.getElementById("totalPrice");
@@ -115,6 +115,7 @@ let panier = localStorage.getItem("produits");
     }
 };
 
+////////////////////// Option changer la quantiter //////////////////////
 
 const changerQuantiter = document.querySelectorAll('.itemQuantity');
 changerQuantiter.forEach(bouton => {
@@ -143,13 +144,15 @@ function changerLaQuantiter(produitEl){
       }
     })
 
-    //récup les ID de tout les produits du localstrorage
+//////////////////////Total Panier Prix//////////////////////
+
+//récup les ID de tout les produits du localstrorage
 
 let tousLesId = [];
 let totalPrix = [];
 let toutLesProduitAvecPrix = [];
 
-function getPanierId(){
+async function getPanierId(){
     let panier = getPanier();
     console.log("contenue du panier", panier)
 ////////////Boucle OK////////////
@@ -157,13 +160,13 @@ panier.forEach(produits => {
     tousLesId.push(produits.id)
     console.log("Les ID de Tout les produits du panier",tousLesId)
 })
-const trouverProduitDeApi = trouverProduitDansApi();
+const products = await getProducts()
+const trouverProduitDeApi = trouverProduitDansApi(products, tousLesId);
 };
 
 ////////////Boucle qui ne marche pas////////////
 function trouverProduitDansApi(products, tousLesId) {
-    console.log("Tout les id test",tousLesId)
-    tousLesId.forEach(function(index){  
+    tousLesId.forEach(function(index){
     toutLesProduitAvecPrix.push(getProducts(index))
 }
 )
@@ -171,3 +174,68 @@ console.log("tous les prix",toutLesProduitAvecPrix)
 };      
 
 const recupererId = getPanierId();
+
+
+
+/*
+//////////////////////Formulaire//////////////////////
+
+//Les données du client sont stockées dans un tableau
+let contactClient = [];
+localStorage.contactClient = JSON.stringify(contactClient);
+//On cible les éléments input, certains ont la même classe car ils réagiront de la même façon aux regex
+//On cible les input prénom, nom et ville
+let prenom = document.querySelector("#firstName");
+prenom.classList.add("regex_texte");
+let nom = document.querySelector("#lastName");
+nom.classList.add("regex_texte");
+let ville = document.querySelector("#city");
+ville.classList.add("regex_texte");
+//On cible l'input adresse
+let adresse = document.querySelector("#address");
+adresse.classList.add("regex_adresse");
+//On cible l'input email
+let email = document.querySelector("#email");
+email.classList.add("regex_email");
+//On cible les éléments qui on la classe regex_texte
+let regexTexte = document.querySelectorAll(".regex_texte");
+
+/////Regex/////
+let regexLettre = /^[a-záàâäãåçéèêëíìîïñóòôöõúùûüýÿæœ\s-]{1,31}$/i;
+let regexChiffreLettre = /^[a-z0-9áàâäãåçéèêëíìîïñóòôöõúùûüýÿæœ\s-]{1,60}$/i;
+let regexEmail = /^[a-z0-9æœ.!#$%&’*+/=?^_`{|}~"(),:;<>@[\]-]{1,60}$/i;
+
+//Ecoute si ces champs sont ok d'après la regex
+regexTexte.forEach((regexTexte) =>
+    regexTexte.addEventListener("input", (e) => {
+        //valeur sera egal a la valeur de l'input
+        valeur = e.target.value;
+        let regexNormal = valeur.search(regexLettre);
+        if (regexNormal === 0) {
+            contactClient.firstName = prenom.value;
+            contactClient.lastName = nom.value;
+            contactClient.city = ville.value;
+        }
+        if (
+            contactClient.city !== "" &&
+            contactClient.lastName !== "" &&
+            contactClient.firstName !== "" &&
+            regexNormal === 0
+        ) {
+            contactClient.regexNormal = 3;
+        } else {
+            contactClient.regexNormal = 0;
+        }
+        localStorage.contactClient = JSON.stringify(contactClient);
+    })
+);*/
+//le champ écouté via la regex regexLettre fera réagir, grâce à texteInfo, la zone concernée
+/*texteInfo(regexLettre, "#firstNameErrorMsg", prenom);
+texteInfo(regexLettre, "#lastNameErrorMsg", nom);
+texteInfo(regexLettre, "#cityErrorMsg", ville);*/
+
+
+//1-Ecoutez si les champs sont ok d'après la regex pour email et adresse
+//2-texteInfo pour la zone concernée
+//3-fonction d'affichage individuel des paragraphes sous input 
+
