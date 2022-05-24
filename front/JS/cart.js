@@ -1,9 +1,9 @@
 import { getProducts, getProduct } from "./api.js";
 
 //On va chercher les données de L'API
-
+let products = [];
 window.onload = async () => {
-  const products = await getProducts()
+    products = await getProducts()
   console.log("les produits de l'api",products)
 }
 
@@ -160,16 +160,22 @@ panier.forEach(produits => {
     tousLesId.push(produits.id)
     console.log("Les ID de Tout les produits du panier",tousLesId)
 })
-const products = await getProducts()
-const trouverProduitDeApi = trouverProduitDansApi(products, tousLesId);
+trouverProduitDansApi(products, tousLesId);
 };
 
 ////////////Boucle qui ne marche pas////////////
 function trouverProduitDansApi(products, tousLesId) {
+    //console.log("coucou")
+products.forEach(function(product){
+    console.log("coucou")
     tousLesId.forEach(function(index){
-    toutLesProduitAvecPrix.push(getProducts(index))
-}
-)
+        console.log("index",index)
+        console.log("product",product)
+        if(product._id === index){
+            toutLesProduitAvecPrix.push(product)
+        }
+    })
+})
 console.log("tous les prix",toutLesProduitAvecPrix)
 };      
 
