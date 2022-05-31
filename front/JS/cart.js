@@ -5,6 +5,7 @@ let products = [];
 window.onload = async () => {
     products = await getProducts()
   console.log("les produits de l'api",products)
+  const recupererId = getPanierId();
 }
 
 // on récupère les donnés du localstorage
@@ -44,42 +45,6 @@ function createElements(panier){
         </div>
     </article>`
 }
-
-////////////////////// Total Quantite //////////////////////
-
-const htmlTotalPanierQuantity = document.getElementById("totalQuantity");
-//const htmlTotalPanierPrice = document.getElementById("totalPrice");
-
-//on créé des tableaux vide
-//let totalPanier = [];
-let totalQuantity = [];
-
-//on créé une boucle pour ajouter chaque prix/quantité au tableau
-for ( let product of panier){
-    //totalPanier.push(product.totalPrice)
-    totalQuantity.push(parseInt(product.number))
-};
-//console.log('Prix Total', totalPanier);
-//console.log('Quantite Total', totalQuantity);
-
-//on additionne les différentes quantité
-//const totalPrice = totalPanier.reduce(function(accumulateur,currentValue){
-    //return (accumulateur + currentValue);
-
-//});
-const quantityTotal = totalQuantity.reduce(function(accumulateur,currentValue){
-    return (accumulateur + currentValue);
-});
-//console.log('Total panier : ', totalPrice);
-//console.log('Total Quantite : ', quantityTotal);
-
-//on les rajoute au localstorage
-//localStorage.setItem("totalPrice", JSON.stringify(totalPrice));
-localStorage.setItem("quantityTotal", JSON.stringify(quantityTotal));
-
-//on les implante dans le HTML
-//htmlTotalPanierPrice.innerHTML += `${totalPrice}`;
-htmlTotalPanierQuantity.innerHTML += `${quantityTotal}`;
 
 ////////////////////// Boutton supprimer //////////////////////
 
@@ -144,104 +109,99 @@ function changerLaQuantiter(produitEl){
       }
     })
 
-//////////////////////Total Panier Prix//////////////////////
+//////////////////////Total Panier Prix/Quantite//////////////////////
 
 //récup les ID de tout les produits du localstrorage
-
+//on créé des tableaux vide
+let totalQuantity = [];
 let tousLesId = [];
-let totalPrix = [];
-let toutLesProduitAvecPrix = [];
+let toutLesPrix = [];
 
 async function getPanierId(){
     let panier = getPanier();
     console.log("contenue du panier", panier)
-////////////Boucle OK////////////
 panier.forEach(produits => {
     tousLesId.push(produits.id)
-    console.log("Les ID de Tout les produits du panier",tousLesId)
 })
 trouverProduitDansApi(products, tousLesId);
 };
 
-////////////Boucle qui ne marche pas////////////
+//On recupère le prix de chaque produit qu'on met dans un tableau
 function trouverProduitDansApi(products, tousLesId) {
-    //console.log("coucou")
 products.forEach(function(product){
-    console.log("coucou")
     tousLesId.forEach(function(index){
-        console.log("index",index)
-        console.log("product",product)
         if(product._id === index){
-            toutLesProduitAvecPrix.push(product)
+            toutLesPrix.push(product.price)
         }
     })
 })
-console.log("tous les prix",toutLesProduitAvecPrix)
-};      
+};
 
-const recupererId = getPanierId();
+const htmlTotalPanierQuantity = document.getElementById("totalQuantity");
+const htmlTotalPanierPrice = document.getElementById("totalPrice");
+
+//on créé une boucle pour ajouter chaque prix/quantité au tableau
+for ( let product of panier){
+    totalQuantity.push(parseInt(product.number))
+};
+console.log('Quantite Total', totalQuantity);
+console.log("tous les prix",toutLesPrix)
+
+//on additionne les différentes quantité
+/*const totalPrice = toutLesPrix.reduce(function(accumulateur,currentValue){
+    return (accumulateur + currentValue);
+
+});*/
+const quantityTotal = totalQuantity.reduce(function(accumulateur,currentValue){
+    return (accumulateur + currentValue);
+});
+//console.log('Total panier : ', totalPrice);
+console.log('Total Quantite : ', quantityTotal);
+
+//on les rajoute au localstorage
+//localStorage.setItem("quantityTotal", JSON.stringify(quantityTotal));
+
+//on les implante dans le HTML
+//htmlTotalPanierPrice.innerHTML += `${totalPrice}`;
+htmlTotalPanierQuantity.innerHTML += `${quantityTotal}`;
 
 
 
-/*
 //////////////////////Formulaire//////////////////////
 
-//Les données du client sont stockées dans un tableau
-let contactClient = [];
-localStorage.contactClient = JSON.stringify(contactClient);
-//On cible les éléments input, certains ont la même classe car ils réagiront de la même façon aux regex
-//On cible les input prénom, nom et ville
-let prenom = document.querySelector("#firstName");
-prenom.classList.add("regex_texte");
-let nom = document.querySelector("#lastName");
-nom.classList.add("regex_texte");
-let ville = document.querySelector("#city");
-ville.classList.add("regex_texte");
-//On cible l'input adresse
-let adresse = document.querySelector("#address");
-adresse.classList.add("regex_adresse");
-//On cible l'input email
-let email = document.querySelector("#email");
-email.classList.add("regex_email");
-//On cible les éléments qui on la classe regex_texte
-let regexTexte = document.querySelectorAll(".regex_texte");
+//regex
+const regexLettre = function(value){
+    return /^[a-záàâäãåçéèêëíìîïñóòôöõúùûüýÿæœ\s-]{1,31}$/i;
+};
 
-/////Regex/////
-let regexLettre = /^[a-záàâäãåçéèêëíìîïñóòôöõúùûüýÿæœ\s-]{1,31}$/i;
-let regexChiffreLettre = /^[a-z0-9áàâäãåçéèêëíìîïñóòôöõúùûüýÿæœ\s-]{1,60}$/i;
-let regexEmail = /^[a-z0-9æœ.!#$%&’*+/=?^_`{|}~"(),:;<>@[\]-]{1,60}$/i;
+const regexEmail = function(value){
+    return /^[a-z0-9æœ.!#$%&’*+/=?^_`{|}~"(),:;<>@[\]-]{1,60}$/i;
+};
 
-//Ecoute si ces champs sont ok d'après la regex
-regexTexte.forEach((regexTexte) =>
-    regexTexte.addEventListener("input", (e) => {
-        //valeur sera egal a la valeur de l'input
-        valeur = e.target.value;
-        let regexNormal = valeur.search(regexLettre);
-        if (regexNormal === 0) {
-            contactClient.firstName = prenom.value;
-            contactClient.lastName = nom.value;
-            contactClient.city = ville.value;
-        }
-        if (
-            contactClient.city !== "" &&
-            contactClient.lastName !== "" &&
-            contactClient.firstName !== "" &&
-            regexNormal === 0
-        ) {
-            contactClient.regexNormal = 3;
-        } else {
-            contactClient.regexNormal = 0;
+const regexAdresse = function(value){
+    return /^[a-z0-9áàâäãåçéèêëíìîïñóòôöõúùûüýÿæœ\s-]{1,60}$/i;
+};
+
+//définition des textes d'erreurs
+
+
+//On récupère les données du formulaire
+document
+    .getElementsByClassName("cart__order__form")
+    [0].addEventListener("submit", function(e){
+        e.preventDefault();
+        ///On stocke les valeurs dans un objet
+        const contactClient = {
+            firstName : document.getElementById("firstName").value,
+            lastName : document.getElementById("lastName").value,
+            email : document.getElementById("email").value,
+            address : document.getElementById("address").value,
+            city : document.getElementById("city").value,
         }
         localStorage.contactClient = JSON.stringify(contactClient);
-    })
-);*/
-//le champ écouté via la regex regexLettre fera réagir, grâce à texteInfo, la zone concernée
-/*texteInfo(regexLettre, "#firstNameErrorMsg", prenom);
-texteInfo(regexLettre, "#lastNameErrorMsg", nom);
-texteInfo(regexLettre, "#cityErrorMsg", ville);*/
+    });
 
 
 //1-Ecoutez si les champs sont ok d'après la regex pour email et adresse
 //2-texteInfo pour la zone concernée
-//3-fonction d'affichage individuel des paragraphes sous input 
 

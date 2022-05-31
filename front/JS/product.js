@@ -56,8 +56,6 @@ let objectProduct = {
   colors: optionColor,
   number: optionQuantity,
   name : product.name,
-  price: product.price,
-  totalPrice: product.price * optionQuantity,
   imageUrl: product.imageUrl,
   imageAlt: product.altTxt,
 }
