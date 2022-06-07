@@ -193,13 +193,19 @@ const regexAdresse = function(value){
     return /^[a-z0-9áàâäãåçéèêëíìîïñóòôöõúùûüýÿæœ\s-]{1,60}$/i.test(value);
 };
 
+/*let matchName = /^(?=.{2,40}$)[a-zA-Z]+(?:[-'\s][a-zA-Z]+)*$/;
+atchLastName = /^(?=.{2,40}$)[a-zA-Z]+(?:[-'\s][a-zA-Z]+)*$/;
+let matchEmail = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+*/
+
 //définition des textes d'erreurs
-function erreurChampManquantVide(e){
-    document.querySelector(`#${e}`).textContent = "";
+function erreurChampManquantVide(el){
+    console.log("elementID",el)
+    document.getElementById(el).innerText = "";
 }
 
-function erreurChampManquant(e){
-    document.querySelector(`#${e}`).textContent = "Ce champ n'est pas valide"
+function erreurChampManquant(el){
+    document.getElementById(el).innerText = "Ce champ n'est pas valide"
 }
 
 //On récupère les données du formulaire
@@ -208,81 +214,73 @@ document
     [0].addEventListener("submit", function(e){
         e.preventDefault();
         ///On stocke les valeurs dans un objet
-        const contactClient = {
+        const contact = {
             firstName : document.getElementById("firstName").value,
             lastName : document.getElementById("lastName").value,
             email : document.getElementById("email").value,
             address : document.getElementById("address").value,
             city : document.getElementById("city").value,
         }
-        console.log("contactClient",contactClient)
+        console.log("contactClient",contact)
 
         //On contrôle les différents champs
 
         function firstNameControl(){
-            const prenom = contactClient.firstName;
+            const prenom = contact.firstName;
             if(regexLettre(prenom)){
-                erreurChampManquantVide(firstNameErrorMsg)
+                erreurChampManquantVide('firstNameErrorMsg')
                 return true;
             }else{
-                erreurChampManquant(firstNameErrorMsg)
+                erreurChampManquant('firstNameErrorMsg')
                 return false;
-                //message erreur
             }
         };
     
         function lastNameControl(){
-            const nom = contactClient.lastName;
+            const nom = contact.lastName;
             if(regexLettre(nom)){
-                erreurChampManquantVide(lastNameErrorMsg)
+                erreurChampManquantVide('lastNameErrorMsg')
                 return true;
             }else{
-                erreurChampManquant(lastNameErrorMsg)
+                erreurChampManquant('lastNameErrorMsg')
                 return false;
             }
         };
     
         function emailControl(){
-            const email = contactClient.email;
+            const email = contact.email;
             if(regexEmail(email)){
-                erreurChampManquantVide(emailErrorMsg)
+                erreurChampManquantVide('emailErrorMsg')
                 return true;
             }else{
-                erreurChampManquant(emailErrorMsg)
+                erreurChampManquant('emailErrorMsg')
                 return false;
             }
         };
     
         function addressControl(){
-            const address = contactClient.address;
+            const address = contact.address;
             if(regexAdresse(address)){
-                erreurChampManquantVide(addressErrorMsg)
+                erreurChampManquantVide('addressErrorMsg')
                 return true;
             }else{
-                erreurChampManquant(addressErrorMsg)
+                erreurChampManquant('addressErrorMsg')
                 return false;
             }
         };
     
         function cityControl(){
-            const ville = contactClient.city;
+            const ville = contact.city;
             if(regexLettre(ville)){
-                erreurChampManquantVide(cityErrorMsg)
+                erreurChampManquantVide('cityErrorMsg')
                 return true;
             }else{
-                erreurChampManquant(cityErrorMsg)
+                erreurChampManquant('cityErrorMsg')
                 return false;
             }
         };
         ///Contrôle validité formulaire avant envoi dans localStorage
         if(lastNameControl() && firstNameControl() && emailControl() && addressControl() && cityControl()){
         //On appelle la fonction de POST
-        localStorage.setItem("contactClient", JSON.stringify(contactClient));
-        }else{
-            console.log(`ERR : Le formulaire n'est pas bien rempli`);
-        };
-    });
-
-//1-Ecoutez si les champs sont ok d'après la regex 
-//2-si non => message d'erreur
-
+        localStorage.setItem("contactClient", JSON.stringify(contact));
+    }});
