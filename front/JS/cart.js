@@ -115,26 +115,46 @@ function changerLaQuantiter(produitEl){
 //on créé des tableaux vide
 let totalQuantity = [];
 let tousLesId = [];
-let toutLesPrix = [];
+let tousLesIdAvecQuantiter = [];
+let toutLesPrix = 0;
+let tousLesPrixAvecQuantiter = [];
 
 async function getPanierId(){
     let panier = getPanier();
     console.log("contenue du panier", panier)
 panier.forEach(produits => {
     tousLesId.push(produits.id)
+    tousLesIdAvecQuantiter.push({id: produits.id, qty: produits.number})
 })
 trouverProduitDansApi(products, tousLesId);
+console.log("Tous les id avec quantiter",tousLesIdAvecQuantiter)
 };
 
 //On recupère le prix de chaque produit qu'on met dans un tableau
 function trouverProduitDansApi(products, tousLesId) {
+    products.forEach(function(product){
+        tousLesId.forEach(function(index){
+            if(product._id === index){
+                toutLesPrix=toutLesPrix+product.price
+            }
+        })
+    })
+//console.log("tous les prix",toutLesPrix)
+//console.log("tous les Id",tousLesId)
+
+
 products.forEach(function(product){
-    tousLesId.forEach(function(index){
-        if(product._id === index){
-            toutLesPrix.push(product.price)
+    tousLesIdAvecQuantiter.forEach(function(index){
+        if(product._id === index.id){
+            console.log("index",index.qty)
+            console.log("prix",product.price)
+            //calculer les prix
+            tousLesPrixAvecQuantiter+=(product.price*index.qty)
         }
     })
 })
+console.log("tous les prix avec quantité",tousLesPrixAvecQuantiter)
+
 };
 
 const htmlTotalPanierQuantity = document.getElementById("totalQuantity");
@@ -145,24 +165,15 @@ for ( let product of panier){
     totalQuantity.push(parseInt(product.number))
 };
 console.log('Quantite Total', totalQuantity);
-console.log("tous les prix",toutLesPrix)
 
-//on additionne les différentes quantité
-/*const totalPrice = toutLesPrix.reduce(function(accumulateur,currentValue){
-    return (accumulateur + currentValue);
-
-});*/
 const quantityTotal = totalQuantity.reduce(function(accumulateur,currentValue){
     return (accumulateur + currentValue);
 });
 //console.log('Total panier : ', totalPrice);
 console.log('Total Quantite : ', quantityTotal);
 
-//on les rajoute au localstorage
-//localStorage.setItem("quantityTotal", JSON.stringify(quantityTotal));
-
 //on les implante dans le HTML
-//htmlTotalPanierPrice.innerHTML += `${totalPrice}`;
+htmlTotalPanierPrice.innerHTML += `${totalPrice}`;
 htmlTotalPanierQuantity.innerHTML += `${quantityTotal}`;
 
 
@@ -171,19 +182,25 @@ htmlTotalPanierQuantity.innerHTML += `${quantityTotal}`;
 
 //regex
 const regexLettre = function(value){
-    return /^[a-záàâäãåçéèêëíìîïñóòôöõúùûüýÿæœ\s-]{1,31}$/i;
+    return /^[a-záàâäãåçéèêëíìîïñóòôöõúùûüýÿæœ\s-]{1,31}$/i.test(value);
 };
 
 const regexEmail = function(value){
-    return /^[a-z0-9æœ.!#$%&’*+/=?^_`{|}~"(),:;<>@[\]-]{1,60}$/i;
+    return /^[a-z0-9æœ.!#$%&’*+/=?^_`{|}~"(),:;<>@[\]-]{1,60}$/i.test(value);
 };
 
 const regexAdresse = function(value){
-    return /^[a-z0-9áàâäãåçéèêëíìîïñóòôöõúùûüýÿæœ\s-]{1,60}$/i;
+    return /^[a-z0-9áàâäãåçéèêëíìîïñóòôöõúùûüýÿæœ\s-]{1,60}$/i.test(value);
 };
 
 //définition des textes d'erreurs
+function erreurChampManquantVide(e){
+    document.querySelector(`#${e}`).textContent = "";
+}
 
+function erreurChampManquant(e){
+    document.querySelector(`#${e}`).textContent = "Ce champ n'est pas valide"
+}
 
 //On récupère les données du formulaire
 document
@@ -198,10 +215,74 @@ document
             address : document.getElementById("address").value,
             city : document.getElementById("city").value,
         }
-        localStorage.contactClient = JSON.stringify(contactClient);
+        console.log("contactClient",contactClient)
+
+        //On contrôle les différents champs
+
+        function firstNameControl(){
+            const prenom = contactClient.firstName;
+            if(regexLettre(prenom)){
+                erreurChampManquantVide(firstNameErrorMsg)
+                return true;
+            }else{
+                erreurChampManquant(firstNameErrorMsg)
+                return false;
+                //message erreur
+            }
+        };
+    
+        function lastNameControl(){
+            const nom = contactClient.lastName;
+            if(regexLettre(nom)){
+                erreurChampManquantVide(lastNameErrorMsg)
+                return true;
+            }else{
+                erreurChampManquant(lastNameErrorMsg)
+                return false;
+            }
+        };
+    
+        function emailControl(){
+            const email = contactClient.email;
+            if(regexEmail(email)){
+                erreurChampManquantVide(emailErrorMsg)
+                return true;
+            }else{
+                erreurChampManquant(emailErrorMsg)
+                return false;
+            }
+        };
+    
+        function addressControl(){
+            const address = contactClient.address;
+            if(regexAdresse(address)){
+                erreurChampManquantVide(addressErrorMsg)
+                return true;
+            }else{
+                erreurChampManquant(addressErrorMsg)
+                return false;
+            }
+        };
+    
+        function cityControl(){
+            const ville = contactClient.city;
+            if(regexLettre(ville)){
+                erreurChampManquantVide(cityErrorMsg)
+                return true;
+            }else{
+                erreurChampManquant(cityErrorMsg)
+                return false;
+            }
+        };
+        ///Contrôle validité formulaire avant envoi dans localStorage
+        if(lastNameControl() && firstNameControl() && emailControl() && addressControl() && cityControl()){
+        //On appelle la fonction de POST
+        localStorage.setItem("contactClient", JSON.stringify(contactClient));
+        }else{
+            console.log(`ERR : Le formulaire n'est pas bien rempli`);
+        };
     });
 
-
-//1-Ecoutez si les champs sont ok d'après la regex pour email et adresse
-//2-texteInfo pour la zone concernée
+//1-Ecoutez si les champs sont ok d'après la regex 
+//2-si non => message d'erreur
 
