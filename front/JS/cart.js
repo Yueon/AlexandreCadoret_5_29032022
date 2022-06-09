@@ -1,5 +1,5 @@
 import { getProducts, getProduct } from "./api.js";
-
+const url = "http://localhost:3000";
 //On va chercher les données de L'API
 let products = [];
 window.onload = async () => {
@@ -114,66 +114,41 @@ function changerLaQuantiter(produitEl){
 //récup les ID de tout les produits du localstrorage
 //on créé des tableaux vide
 let totalQuantity = [];
-let tousLesId = [];
 let tousLesIdAvecQuantiter = [];
-let toutLesPrix = 0;
-let tousLesPrixAvecQuantiter = [];
+let totalPrice = 0;
 
+//on récupère le panier et on place l'id et la quantité de chaque produit dans un tableau
 async function getPanierId(){
     let panier = getPanier();
-    console.log("contenue du panier", panier)
 panier.forEach(produits => {
-    tousLesId.push(produits.id)
     tousLesIdAvecQuantiter.push({id: produits.id, qty: produits.number})
 })
-trouverProduitDansApi(products, tousLesId);
-console.log("Tous les id avec quantiter",tousLesIdAvecQuantiter)
-};
-
-//On recupère le prix de chaque produit qu'on met dans un tableau
-function trouverProduitDansApi(products, tousLesId) {
-    products.forEach(function(product){
-        tousLesId.forEach(function(index){
-            if(product._id === index){
-                toutLesPrix=toutLesPrix+product.price
-            }
-        })
-    })
-//console.log("tous les prix",toutLesPrix)
-//console.log("tous les Id",tousLesId)
-
-
+//on va chercher l'id du produit commander dans l'API pour pouvoir recupérer le prix, pour ensuite le multipler a la quantiter commander
 products.forEach(function(product){
     tousLesIdAvecQuantiter.forEach(function(index){
         if(product._id === index.id){
-            console.log("index",index.qty)
-            console.log("prix",product.price)
             //calculer les prix
-            tousLesPrixAvecQuantiter+=(product.price*index.qty)
+            totalPrice += product.price*index.qty
         }
     })
 })
-console.log("tous les prix avec quantité",tousLesPrixAvecQuantiter)
-
+//on les implante dans le HTML
+const htmlTotalPanierPrice = document.getElementById("totalPrice");
+htmlTotalPanierPrice.innerHTML += `${totalPrice}`;
 };
 
-const htmlTotalPanierQuantity = document.getElementById("totalQuantity");
-const htmlTotalPanierPrice = document.getElementById("totalPrice");
-
-//on créé une boucle pour ajouter chaque prix/quantité au tableau
+//on créé une boucle pour ajouter les quantités au tableau
 for ( let product of panier){
     totalQuantity.push(parseInt(product.number))
 };
-console.log('Quantite Total', totalQuantity);
 
+//on additionne les quantités du tableau entre elle
 const quantityTotal = totalQuantity.reduce(function(accumulateur,currentValue){
     return (accumulateur + currentValue);
 });
-//console.log('Total panier : ', totalPrice);
-console.log('Total Quantite : ', quantityTotal);
 
 //on les implante dans le HTML
-htmlTotalPanierPrice.innerHTML += `${totalPrice}`;
+const htmlTotalPanierQuantity = document.getElementById("totalQuantity");
 htmlTotalPanierQuantity.innerHTML += `${quantityTotal}`;
 
 
@@ -182,25 +157,19 @@ htmlTotalPanierQuantity.innerHTML += `${quantityTotal}`;
 
 //regex
 const regexLettre = function(value){
-    return /^[a-záàâäãåçéèêëíìîïñóòôöõúùûüýÿæœ\s-]{1,31}$/i.test(value);
+    return /^(?=.{2,40}$)[a-zA-Z]+(?:[-'\s][a-zA-Z]+)*$/i.test(value);
 };
 
 const regexEmail = function(value){
-    return /^[a-z0-9æœ.!#$%&’*+/=?^_`{|}~"(),:;<>@[\]-]{1,60}$/i.test(value);
+    return /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/i.test(value);
 };
 
 const regexAdresse = function(value){
     return /^[a-z0-9áàâäãåçéèêëíìîïñóòôöõúùûüýÿæœ\s-]{1,60}$/i.test(value);
 };
 
-/*let matchName = /^(?=.{2,40}$)[a-zA-Z]+(?:[-'\s][a-zA-Z]+)*$/;
-atchLastName = /^(?=.{2,40}$)[a-zA-Z]+(?:[-'\s][a-zA-Z]+)*$/;
-let matchEmail = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-*/
-
 //définition des textes d'erreurs
 function erreurChampManquantVide(el){
-    console.log("elementID",el)
     document.getElementById(el).innerText = "";
 }
 
@@ -282,5 +251,39 @@ document
         ///Contrôle validité formulaire avant envoi dans localStorage
         if(lastNameControl() && firstNameControl() && emailControl() && addressControl() && cityControl()){
         //On appelle la fonction de POST
-        localStorage.setItem("contactClient", JSON.stringify(contact));
-    }});
+        envoiPaquet()
+        }
+
+//////////////////////Post//////////////////////
+
+function envoiPaquet() {
+    //on place les id des produits dans un tableau
+    let produitsId = [];
+    let panier = getPanier();
+    panier.forEach(produits => {
+        produitsId.push(produits.id)
+    })
+    console.log("Id des produits du panier", produitsId)
+    //on regroupe l'objet contact et le tableau des id
+    let commandeFinale = {
+        contact : contact,
+        produits : produitsId,
+    };
+    console.log("commande finale",commandeFinale)
+    // envoi à la ressource api
+    fetch(`http://localhost:3000/api/products/order`, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(commandeFinale)
+    })
+    .then((res) => {
+        return res.json()
+    })
+    .catch(function(err) {
+        console.log(err)
+      });
+}
+});
