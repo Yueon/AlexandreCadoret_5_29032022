@@ -58,6 +58,7 @@ let objectProduct = {
   name : product.name,
   imageUrl: product.imageUrl,
   imageAlt: product.altTxt,
+  price: product.price
 }
 console.log('produit ajouté au panier :', objectProduct)
 

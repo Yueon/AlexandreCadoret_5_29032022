@@ -274,7 +274,7 @@ function envoiPaquet() {
     fetch(`http://localhost:3000/api/products/order`, {
       method: 'POST',
       headers: {
-        'Accept': 'application/json',
+        Accept: 'application/json',
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(commandeFinale)
@@ -282,6 +282,9 @@ function envoiPaquet() {
     .then((res) => {
         return res.json()
     })
+    .then((data) => {
+        window.location.href = `/front/html/confirmation.html?commande=${data.orderId}`;
+      })
     .catch(function(err) {
         console.log(err)
       });
