@@ -88,9 +88,13 @@ changerQuantiter.forEach(bouton => {
     e.preventDefault()
     console.log("event e",e)
     const produitEl = e.target.closest("article.cart__item");
-    console.log("element du boutton", produitEl)
-    changerLaQuantiter(produitEl)
-       });
+    if (produitEl.getElementsByClassName('itemQuantity')[0] > 1 && produitEl.getElementsByClassName('itemQuantity')[0] < 100){
+        console.log("element du boutton", produitEl)
+        changerLaQuantiter(produitEl)
+        window.location.reload();
+    }
+    }
+);
 
 function changerLaQuantiter(produitEl){
         let panier = getPanier();
@@ -256,37 +260,33 @@ document
 
 //////////////////////Post//////////////////////
 
-function envoiPaquet() {
+async function envoiPaquet() {
     //on place les id des produits dans un tableau
-    let produitsId = [];
+    let products = [];
     let panier = getPanier();
     panier.forEach(produits => {
-        produitsId.push(produits.id)
+        products.push(produits.id)
     })
-    console.log("Id des produits du panier", produitsId)
-    //on regroupe l'objet contact et le tableau des id
-    let commandeFinale = {
-        contact : contact,
-        produits : produitsId,
-    };
-    console.log("commande finale",commandeFinale)
+    console.log("Id des produits du panier", products)
     // envoi à la ressource api
-    fetch(`http://localhost:3000/api/products/order`, {
+    const order = await fetch(`http://localhost:3000/api/products/order`, {
       method: 'POST',
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(commandeFinale)
+      body: JSON.stringify({
+          contact,
+          products
+      })
     })
     .then((res) => {
         return res.json()
     })
-    .then((data) => {
-        window.location.href = `/front/html/confirmation.html?commande=${data.orderId}`;
-      })
     .catch(function(err) {
         console.log(err)
       });
+      window.location.href = `/front/html/confirmation.html?commande=${order.orderId}`;
+      console.log("order",order)
 }
 });
