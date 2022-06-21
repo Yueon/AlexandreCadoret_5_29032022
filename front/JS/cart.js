@@ -283,8 +283,8 @@ async function envoiPaquet() {
     .then((res) => {
         return res.json()
     })
-    .catch(function(err) {
-        console.log(err)
+    .catch(function() {
+        window.location.href = '404.html';
       });
       window.location.href = `/front/html/confirmation.html?commande=${order.orderId}`;
       console.log("order",order)

@@ -1,0 +1,24 @@
+.confirmation {
+    display: flex;
+    justify-content: center;
+    height: 500px;
+    width: 65%;
+    margin-top: 85px;
+    margin-bottom: 85px;
+}
+
+.confirmation {
+    background-color: white;
+    background-image: url("../images/Error404.webp");
+    background-size: cover;
+    color: #3d424f;
+    text-align: center;
+    font-weight: 500;
+    padding: 30px;
+    border-radius: 25px;
+}
+
+.limitedWidthBlock {
+    justify-content: center;
+    display: flex;
+}

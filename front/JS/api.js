@@ -8,9 +8,8 @@ export function getProducts(){
       return res.json();
     }
   })
-  .catch(function(err) {
-    console.log(err)
-    // Une erreur est survenue faire un truc
+  .catch(function() {
+    window.location.href = '404.html';
   });
 }
 
@@ -22,8 +21,7 @@ export function getProduct(urlId){
       return res.json();
     }
   }) 
-  .catch(function(err) {
-    console.log(err)
-    // Une erreur est survenue faire un truc
+  .catch(function() {
+    window.location.href = '404.html';
   });
 }

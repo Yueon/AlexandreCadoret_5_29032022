@@ -43,11 +43,13 @@ document
     console.log('couleur choisie :', optionColor)
     let optionQuantity = document.getElementById('quantity').value
     console.log('quantité choisie :', optionQuantity)
-
-    if(optionQuantity > 0 && optionColor.length > 0) {
+    if(optionQuantity > 0 && optionQuantity <101 && optionColor.length > 0) {
+    document.querySelector("#addToCart").style.color = "rgb(0, 205, 0)";
+    document.querySelector("#addToCart").textContent = "Produit ajouté !";
     }else {
-    console.log('quantité non sélectionné')
-    }
+    document.querySelector("#addToCart").style.color = "rgb(255, 0, 0)";
+    alert("Pour valider le choix de cet article, veuillez renseigner une couleur, et/ou une quantité valide entre 1 et 100");
+    };
         
 //on place les valeurs dans un objet
 
