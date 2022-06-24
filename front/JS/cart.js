@@ -1,11 +1,12 @@
 import { getProducts, getProduct } from "./api.js";
 const url = "http://localhost:3000";
+
+const htmlPanier = document.getElementById("cart__items")
 //On va chercher les données de L'API
 let products = [];
 window.onload = async () => {
     products = await getProducts()
-  console.log("les produits de l'api",products)
-  const recupererId = getPanierId();
+    const recupererId = getPanierId();
 }
 
 // on récupère les donnés du localstorage
@@ -16,7 +17,6 @@ console.log('localStorage : ',panier);
 ////////////////////// Afficher les produits //////////////////////
 
 //On implémente le HTML
-const htmlPanier = document.getElementById("cart__items")
 createElements(panier)
 
 function createElements(panier){
@@ -73,6 +73,10 @@ function removeFromPanier(produitEl){
 function getPanier(){
 let panier = localStorage.getItem("produits");
     if(panier == null){
+        htmlPanier.innerHTML += 
+        `<div id=panierVide">
+                <p>Le panier est vide</p>
+            </div>`
         return [];
     }else{
     //console.log('Il y a déjà des produits dans le localStrorage')
@@ -88,19 +92,20 @@ changerQuantiter.forEach(bouton => {
     e.preventDefault()
     console.log("event e",e)
     const produitEl = e.target.closest("article.cart__item");
-    if (produitEl.getElementsByClassName('itemQuantity')[0] > 1 && produitEl.getElementsByClassName('itemQuantity')[0] < 100){
+    if (produitEl.getElementsByClassName('itemQuantity')[0] > 0 && produitEl.getElementsByClassName('itemQuantity')[0] < 101){
         console.log("element du boutton", produitEl)
         changerLaQuantiter(produitEl)
-        window.location.reload();
+        window.location.reload()
     }
     }
 );
 
 function changerLaQuantiter(produitEl){
         let panier = getPanier();
+        console.log("panier", panier)
         let indexEl = panier.findIndex((p) => p.id == produitEl.dataset.id && p.colors == produitEl.dataset.color);
-        //console.log("couleur de l'element",produitEl.dataset.color)
-        //console.log("contenue du panier",panier)
+        console.log("couleur de l'element",produitEl.dataset.color)
+        console.log("contenue du panier",panier)
         console.log("index",indexEl)
         let nouvelleQuantiter = produitEl.getElementsByClassName('itemQuantity');
         console.log("nouvelle quantiter",nouvelleQuantiter[0].value)
@@ -124,8 +129,8 @@ let totalPrice = 0;
 //on récupère le panier et on place l'id et la quantité de chaque produit dans un tableau
 async function getPanierId(){
     let panier = getPanier();
-panier.forEach(produits => {
-    tousLesIdAvecQuantiter.push({id: produits.id, qty: produits.number})
+    panier.forEach(produits => {
+        tousLesIdAvecQuantiter.push({id: produits.id, qty: produits.number})
 })
 //on va chercher l'id du produit commander dans l'API pour pouvoir recupérer le prix, pour ensuite le multipler a la quantiter commander
 products.forEach(function(product){

@@ -3,6 +3,8 @@ import { savePanier } from "./utils.js";
 import { getPanier } from "./utils.js";
 
 let product
+let quantiteInput = document.getElementById("quantity");
+let colorSelect = document.getElementById("colors");
 
 //On récupère l'ID du produit
 const paramsUrl = new URLSearchParams(window.location.search)
@@ -11,9 +13,13 @@ const paramsUrl = new URLSearchParams(window.location.search)
 
 window.onload = async () => {
   product = await getProduct(urlId)
+  console.log(product)
+  if (product === undefined){
+    return window.location.href = '404.html';
+  }
   createElements(product)
 }
-
+//////////////////////On place les infos Produits//////////////////////
 function createElements(product){
 
     //On implémente le HTML
@@ -33,41 +39,22 @@ function createElements(product){
       optionHtml.innerHTML += `<option value="${options}">${options}</option>`
       })
 }
-
-    //on récupère les produits sélectionner par l'utilisateur
-
+//////////////////////Ajouts des produits au panier//////////////////////
+//on récupère les produits et leurs options sélectionner par l'utilisateur
 document
   .getElementById('addToCart')
   .addEventListener("click", function(Event){
+    createErrorMsgHTMLElement()
     let optionColor = document.getElementById('colors').value
     console.log('couleur choisie :', optionColor)
     let optionQuantity = document.getElementById('quantity').value
     console.log('quantité choisie :', optionQuantity)
-    if(optionQuantity > 0 && optionQuantity <101 && optionColor.length > 0) {
-    document.querySelector("#addToCart").style.color = "rgb(0, 205, 0)";
-    document.querySelector("#addToCart").textContent = "Produit ajouté !";
-    }else {
-    document.querySelector("#addToCart").style.color = "rgb(255, 0, 0)";
-    alert("Pour valider le choix de cet article, veuillez renseigner une couleur, et/ou une quantité valide entre 1 et 100");
-    };
-        
-//on place les valeurs dans un objet
-
-let objectProduct = {
-  id: product._id,
-  colors: optionColor,
-  number: optionQuantity,
-  name : product.name,
-  imageUrl: product.imageUrl,
-  imageAlt: product.altTxt,
-  price: product.price
-}
-console.log('produit ajouté au panier :', objectProduct)
+    //si au moin une de ces valeurs n'est pas acceptée (ajout au panier invalide)
+    checkValidationProduit(optionColor, optionQuantity);
+  });
 
 // On ajoute les produits dans le localStorage
 
-const ajoutAuPanier = addPanier(objectProduct)
-        
 function addPanier(objectProduct){
   let panier = getPanier();
   panier = [].concat(panier);
@@ -83,4 +70,60 @@ function addPanier(objectProduct){
       console.log("nouveau produit", panier)
      }
     savePanier(panier);
-}});
+};
+//////////////////////Gestion erreur//////////////////////
+//on créer une div pour les messages d'erreur des option du canapé
+function createErrorMsgHTMLElement() {
+  let errorElementColors = document.createElement("div");
+  let errorElementQuantite = document.createElement("div");
+  errorElementQuantite.setAttribute("id", "error-msg-quantite");
+  errorElementColors.setAttribute("id", "error-msg-colors");
+  colorSelect.after(errorElementColors);
+  quantiteInput.after(errorElementQuantite);
+}
+//fonction pour caché les messages d'erreur
+function hideError() {
+  let errorElementColors = document.getElementById("error-msg-colors");
+  errorElementColors.innerText = "";
+  let errorElementQuantite = document.getElementById("error-msg-quantite");
+  errorElementQuantite.innerText = "";
+}
+//message d'erreur pour la couleur choisie
+function displayErrorC(msg) {
+  let errorElementColors = document.getElementById("error-msg-colors");
+  errorElementColors.innerText = msg;
+}
+//message d'erreur pour la quantité séléctionner
+function displayErrorQ(msg) {
+  let errorElementQuantite = document.getElementById("error-msg-quantite");
+  errorElementQuantite.innerText = msg;
+}
+//fonction pour vérifier si les options du canapé commander sont bien remplie
+function checkValidationProduit(optionColor, optionQuantity) {
+  hideError()
+  if (optionColor === "") {
+    displayErrorC('veillez séléctionner une couleur')
+    document.querySelector("#addToCart").style.color = "rgb(255, 0, 0)";
+  }
+  if(optionQuantity < 1 || optionQuantity >100){
+    displayErrorQ('veillez choisir un nombre entre 1 et 100')
+    document.querySelector("#addToCart").style.color = "rgb(255, 0, 0)";
+  }
+  else if (optionColor != "" && optionQuantity > 0 && optionQuantity <101){
+    document.querySelector("#addToCart").style.color = "rgb(0, 205, 0)";
+    document.querySelector("#addToCart").textContent = "Produit ajouté !";
+    //on place les valeurs dans un objet
+    let objectProduct = {
+      id: product._id,
+      colors: optionColor,
+      number: optionQuantity,
+      name : product.name,
+      imageUrl: product.imageUrl,
+      imageAlt: product.altTxt,
+      price: product.price
+    }
+    console.log('produit ajouté au panier :', objectProduct)
+    const ajoutAuPanier = addPanier(objectProduct)
+    //location.reload();
+  }
+}
