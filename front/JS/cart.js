@@ -13,6 +13,12 @@ window.onload = async () => {
 
 const panier = JSON.parse(localStorage.getItem('produits'));
 console.log('localStorage : ',panier);
+if(panier === []){
+    htmlPanier.innerHTML += 
+        `<div id=panierVide">
+                <p>Le panier est vide</p>
+            </div>`
+};
 
 ////////////////////// Afficher les produits //////////////////////
 
@@ -58,28 +64,26 @@ htmlBouttonSupprimer.forEach(bouton => {
         console.log("element du boutton", produitEl)
         removeFromPanier(produitEl);
         window.location.reload()
-           });        
+           });
 });
 
 function removeFromPanier(produitEl){
     let panier = getPanier();
     let index = panier.filter(p => p.id == produitEl.dataset.id && p.colors == produitEl.dataset.color);
-    console.log("couleur de l'element",produitEl.dataset.color)
-    console.log("contenue du panier",panier)
     panier.splice(index, 1);
     localStorage.setItem("produits", JSON.stringify(panier));
-  };
+};
 
 function getPanier(){
 let panier = localStorage.getItem("produits");
-    if(panier == null){
+console.log("panier", panier)
+    if(panier === null || panier.length === 0){
         htmlPanier.innerHTML += 
         `<div id=panierVide">
                 <p>Le panier est vide</p>
             </div>`
         return [];
     }else{
-    //console.log('Il y a déjà des produits dans le localStrorage')
         return JSON.parse(panier);
     }
 };
@@ -92,7 +96,7 @@ changerQuantiter.forEach(bouton => {
     e.preventDefault()
     console.log("event e",e)
     const produitEl = e.target.closest("article.cart__item");
-    if (produitEl.getElementsByClassName('itemQuantity')[0] > 0 && produitEl.getElementsByClassName('itemQuantity')[0] < 101){
+    if (produitEl.getElementsByClassName('itemQuantity')[0].value > 0 && produitEl.getElementsByClassName('itemQuantity')[0].value < 101){
         console.log("element du boutton", produitEl)
         changerLaQuantiter(produitEl)
         window.location.reload()
@@ -122,7 +126,7 @@ function changerLaQuantiter(produitEl){
 
 //récup les ID de tout les produits du localstrorage
 //on créé des tableaux vide
-let totalQuantity = [];
+let totalQuantity = [0];
 let tousLesIdAvecQuantiter = [];
 let totalPrice = 0;
 
@@ -154,7 +158,7 @@ for ( let product of panier){
 //on additionne les quantités du tableau entre elle
 const quantityTotal = totalQuantity.reduce(function(accumulateur,currentValue){
     return (accumulateur + currentValue);
-});
+})
 
 //on les implante dans le HTML
 const htmlTotalPanierQuantity = document.getElementById("totalQuantity");
@@ -200,7 +204,11 @@ document
             city : document.getElementById("city").value,
         }
         console.log("contactClient",contact)
-
+        lastNameControl();
+        firstNameControl();
+        emailControl();
+        addressControl();
+        cityControl();
         //On contrôle les différents champs
 
         function firstNameControl(){

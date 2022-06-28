@@ -14,6 +14,7 @@ const paramsUrl = new URLSearchParams(window.location.search)
 window.onload = async () => {
   product = await getProduct(urlId)
   console.log(product)
+  createErrorMsgHTMLElement()
   if (product === undefined){
     return window.location.href = '404.html';
   }
@@ -44,7 +45,6 @@ function createElements(product){
 document
   .getElementById('addToCart')
   .addEventListener("click", function(Event){
-    createErrorMsgHTMLElement()
     let optionColor = document.getElementById('colors').value
     console.log('couleur choisie :', optionColor)
     let optionQuantity = document.getElementById('quantity').value
@@ -124,6 +124,5 @@ function checkValidationProduit(optionColor, optionQuantity) {
     }
     console.log('produit ajouté au panier :', objectProduct)
     const ajoutAuPanier = addPanier(objectProduct)
-    //location.reload();
   }
 }
