@@ -1,84 +1,38 @@
-import { getProducts, getProduct } from "./api.js";
+import { getProducts } from "./api.js";
+import { savePanier } from "./utils.js";
 const htmlPanier = document.getElementById("cart__items")
-let panier = getPanier();
-for(let product of panier){
-    product.number = product.number * 1
-}
-//On va chercher les données de L'API
 let products = [];
+let panier;
+
+
+
+//On va chercher les données de L'API
 window.onload = async () => {
+    panier = getPanier();
+
+    for(let product of panier){
+        product.number = product.number * 1
+    }
+
     products = await getProducts()
     if (products === undefined){
         return window.location.href = '404.html';
       }
-    const recupererId = getPanierId();
-    //const affichageProduits = createElements()
+    // On récupère les iD
+    getPanierId(); 
+    // On crée les éléments
+    createElements()  
+    // On calcule le total
+    calculTotal()
+    // On ajoute les évènements
+    eventChangeQuantity()
+    eventSupprimerProduit()
 }
 
-////////////////////// Afficher les produits //////////////////////
-//On implémente le HTML
-createElements()
-function createElements(){
-    products
-    panier
-    //Ajouter le prix dans l'objet panier
-    /*panier.forEach(function(product){
-        products.forEach(function(index){
-            if(product.id === index._id){                
-                panier.push(index.price)
-            }
-        })
-    })
-    console.log("panier",panier)
-    console.log("produit api",products)*/
-
-    for(let product of panier)
-    htmlPanier.innerHTML += 
-    `<article class="cart__item" data-id="${product.id}" data-color="${product.colors}">
-        <div class="cart__item__img">
-            <img src="${product.imageUrl}" alt="${product.altTxt}">
-        </div>
-        <div class="cart__item__content">
-            <div class="cart__item__content__description">
-                <h2>${product.name}</h2>
-                <p>${product.colors}</p>
-                <p>${panier.price}</p>
-            </div>
-            <div class="cart__item__content__settings">
-                <div class="cart__item__content__settings__quantity">
-                    <p>Qté : </p>
-                    <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${product.number}">
-                </div>
-                <div class="cart__item__content__settings__delete">
-                    <p class="deleteItem" >Supprimer</p>
-                </div>
-            </div>
-        </div>
-    </article>`
-}
-////////////////////// Boutton supprimer //////////////////////
-const htmlBouttonSupprimer = document.querySelectorAll('.deleteItem');
-//console.log("bouton supprimer", htmlBouttonSupprimer)
-htmlBouttonSupprimer.forEach(bouton => {
-        bouton.addEventListener("click", function(e) {
-        e.preventDefault()
-        console.log("event e",e)
-        const produitEl = e.target.closest("article.cart__item");
-        removeFromPanier(produitEl);
-        window.location.reload()
-           });
-});
-
-function removeFromPanier(produitEl){
-    panier
-    let index = panier.filter(p => p.id == produitEl.dataset.id && p.colors == produitEl.dataset.color);
-    panier.splice(index, 1);
-    localStorage.setItem("produits", JSON.stringify(panier));
-};
-
+// Récupère le panier du LS et retourne le panier
 function getPanier(){
-let panier = JSON.parse(localStorage.getItem("produits"));
-
+    let panier = JSON.parse(localStorage.getItem("produits"));
+    
     if(panier === null || panier.length === 0){
         htmlPanier.innerHTML += 
         `<div id=panierVide">
@@ -86,58 +40,13 @@ let panier = JSON.parse(localStorage.getItem("produits"));
             </div>`
         return [];
     }else{
+       
         return panier;
     }
 };
 
-////////////////////// Option changer la quantiter //////////////////////
-
-let changerQuantiter = document.querySelectorAll('.itemQuantity');
-//on créer une div pour les messages d'erreur du changement de quantité
-changerQuantiter.forEach(function(e){
-    let errorElementQuantite = document.createElement("div");
-    errorElementQuantite.setAttribute("class", "error-msg-modif-quantite");
-    e.after(errorElementQuantite);
-});
-
-changerQuantiter.forEach(bouton => {
-    bouton.addEventListener("change", function(e) {
-    e.preventDefault()
-    console.log("event e",e)
-    //on selectionne le produit sur lequel on change la quantiter
-    const produitEl = e.target.closest("article.cart__item");
-    //si la quantiter est entre 1 et 100 on appel la fonction 'changerLaQuantiter' sinon on affiche un message d'erreur
-    if (produitEl.getElementsByClassName('itemQuantity')[0].value > 0 && produitEl.getElementsByClassName('itemQuantity')[0].value < 101){
-        console.log("element du boutton", produitEl)
-        produitEl.getElementsByClassName('error-msg-modif-quantite')[0].innerText = ""
-        changerLaQuantiter(produitEl)
-        window.location.reload()
-    }else{
-        produitEl.getElementsByClassName('error-msg-modif-quantite')[0].innerText = "Veillez choisir une quantité entre 1 et 100"
-    }
-    })
-});
-
-function changerLaQuantiter(produitEl){
-    //on cherche dans le panier le produit qui corresponds a celui dont on veut modifier la quantiter
-    panier
-    let indexEl = panier.findIndex((p) => p.id == produitEl.dataset.id && p.colors == produitEl.dataset.color);
-    let nouvelleQuantiter = produitEl.getElementsByClassName('itemQuantity');
-    panier[indexEl].number = nouvelleQuantiter[0].value
-    //remplacer la valeur quantiter du localStorage avec la nouvelle
-    localStorage.setItem("produits", JSON.stringify(panier));
-}
-//////////////////////Total Panier Prix/Quantite//////////////////////
-
-//récup les ID de tout les produits du localstrorage
-//on créé des tableaux vide
-let totalQuantity = [0];
-let tousLesIdAvecQuantiter = [];
-let totalPrice = 0;
-
 //on récupère le panier et on place l'id et la quantité de chaque produit dans un tableau
-async function getPanierId(){
-    panier
+async function getPanierId(){   
     panier.forEach(produits => {
         tousLesIdAvecQuantiter.push({id: produits.id, qty: produits.number})
     })
@@ -157,6 +66,136 @@ async function getPanierId(){
     htmlTotalPanierPrice.innerHTML += `${totalPrice}`;
 };
 
+////////////////////// Afficher les produits //////////////////////
+//On implémente le HTML
+function createElements(){
+
+    console.log("LS - panier",panier)
+    console.log("BDD - products",products)
+
+    let panierComplet = [];
+
+    // Pour chaque produit du panier LS
+    // On va comparer chaque produit PRODUCTS et voir si l'id correspond
+    // Dans ce cas, on recrée un produit tout neuf avec toutes les valeurs que l'on veut
+    panier.forEach(function(p){
+        products.forEach(function(product){
+            if(p.id === product._id){
+                //calculer les prix
+                panierComplet.push({
+                    name: product.name,
+                    colors: p.colors,
+                    price: product.price,
+                    imageUrl: product.imageUrl,
+                    id: product._id,
+                    number: p.number
+                })
+            }
+        })
+    })
+    console.log("Panier reforgé - panierComplet",panierComplet)
+
+    // On utilise le nouveau panier
+    for(let product of panierComplet)
+    htmlPanier.innerHTML += 
+    `<article class="cart__item" data-id="${product.id}" data-color="${product.colors}">
+        <div class="cart__item__img">
+            <img src="${product.imageUrl}" alt="${product.altTxt}">
+        </div>
+        <div class="cart__item__content">
+            <div class="cart__item__content__description">
+                <h2>${product.name}</h2>
+                <p>${product.colors}</p>
+                <p>${product.price}</p>
+            </div>
+            <div class="cart__item__content__settings">
+                <div class="cart__item__content__settings__quantity">
+                    <p>Qté : </p>
+                    <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${product.number}">
+                </div>
+                <div class="cart__item__content__settings__delete">
+                    <p class="deleteItem" >Supprimer</p>
+                </div>
+            </div>
+        </div>
+    </article>`
+}
+
+function eventSupprimerProduit(){
+////////////////////// Boutton supprimer //////////////////////
+const htmlBouttonSupprimer = document.querySelectorAll('.deleteItem');
+//console.log("bouton supprimer", htmlBouttonSupprimer)
+htmlBouttonSupprimer.forEach(bouton => {
+        bouton.addEventListener("click", function(e) {
+        e.preventDefault()
+        console.log("event e",e)
+        const produitEl = e.target.closest("article.cart__item");
+        removeFromPanier(produitEl);
+        window.location.reload()
+           });
+});
+}
+
+
+function removeFromPanier(produitEl){
+    
+    let index = panier.filter(p => p.id == produitEl.dataset.id && p.colors == produitEl.dataset.color);
+    panier.splice(index, 1);
+    savePanier(panier);
+};
+
+
+function eventChangeQuantity() {
+    let changerQuantiter = document.querySelectorAll('.itemQuantity');
+    //on créer une div pour les messages d'erreur du changement de quantité
+    changerQuantiter.forEach(function(e){
+        let errorElementQuantite = document.createElement("div");
+        errorElementQuantite.setAttribute("class", "error-msg-modif-quantite");
+        e.after(errorElementQuantite);
+    });
+    
+    changerQuantiter.forEach(bouton => {
+        bouton.addEventListener("change", function(e) {
+        e.preventDefault()
+        console.log("event e",e)
+        //on selectionne le produit sur lequel on change la quantiter
+        const produitEl = e.target.closest("article.cart__item");
+        //si la quantiter est entre 1 et 100 on appel la fonction 'changerLaQuantiter' sinon on affiche un message d'erreur
+        if (produitEl.getElementsByClassName('itemQuantity')[0].value > 0 && produitEl.getElementsByClassName('itemQuantity')[0].value < 101){
+            console.log("element du boutton", produitEl)
+            produitEl.getElementsByClassName('error-msg-modif-quantite')[0].innerText = ""
+            changerLaQuantiter(produitEl)
+            window.location.reload()
+        }else{
+            produitEl.getElementsByClassName('error-msg-modif-quantite')[0].innerText = "Veillez choisir une quantité entre 1 et 100"
+        }
+        })
+    });
+    
+}
+
+////////////////////// Option changer la quantiter //////////////////////
+
+
+function changerLaQuantiter(produitEl){
+    //on cherche dans le panier le produit qui corresponds a celui dont on veut modifier la quantiter
+    
+    let indexEl = panier.findIndex((p) => p.id == produitEl.dataset.id && p.colors == produitEl.dataset.color);
+    let nouvelleQuantiter = produitEl.getElementsByClassName('itemQuantity');
+    panier[indexEl].number = nouvelleQuantiter[0].value
+    //remplacer la valeur quantiter du localStorage avec la nouvelle
+    localStorage.setItem("produits", JSON.stringify(panier));
+}
+//////////////////////Total Panier Prix/Quantite//////////////////////
+
+//récup les ID de tout les produits du localstrorage
+//on créé des tableaux vide
+let totalQuantity = [0];
+let tousLesIdAvecQuantiter = [];
+let totalPrice = 0;
+
+
+function calculTotal(){
 //on créé une boucle pour ajouter les quantités au tableau
 for ( let product of panier){
     totalQuantity.push(parseInt(product.number))
@@ -170,6 +209,11 @@ const quantityTotal = totalQuantity.reduce(function(accumulateur,currentValue){
 //on les implante dans le HTML
 const htmlTotalPanierQuantity = document.getElementById("totalQuantity");
 htmlTotalPanierQuantity.innerHTML += `${quantityTotal}`;
+}
+
+
+
+
 
 
 
@@ -189,12 +233,8 @@ const regexAdresse = function(value){
 };
 
 //définition des textes d'erreurs
-function erreurChampManquantVide(el){
-    document.getElementById(el).innerText = "";
-};
-
-function erreurChampManquant(el){
-    document.getElementById(el).innerText = "Ce champ n'est pas valide"
+function erreurChampManquant(el, msg){
+    document.getElementById(el).innerText = msg
 };
 
 //On récupère les données du formulaire
@@ -211,20 +251,16 @@ document
             city : document.getElementById("city").value,
         }
         console.log("contactClient",contact)
-        lastNameControl();
-        firstNameControl();
-        emailControl();
-        addressControl();
-        cityControl();
+        
         //On contrôle les différents champs
 
         function firstNameControl(){
             const prenom = contact.firstName;
             if(regexLettre(prenom)){
-                erreurChampManquantVide('firstNameErrorMsg')
+                erreurChampManquant('firstNameErrorMsg', "")
                 return true;
             }else{
-                erreurChampManquant('firstNameErrorMsg')
+                erreurChampManquant('firstNameErrorMsg', "Ce champ est non valide");
                 return false;
             }
         };
@@ -232,10 +268,10 @@ document
         function lastNameControl(){
             const nom = contact.lastName;
             if(regexLettre(nom)){
-                erreurChampManquantVide('lastNameErrorMsg')
+                erreurChampManquant('lastNameErrorMsg',"")
                 return true;
             }else{
-                erreurChampManquant('lastNameErrorMsg')
+                erreurChampManquant('lastNameErrorMsg', "Ce champ est non valide")
                 return false;
             }
         };
@@ -243,10 +279,10 @@ document
         function emailControl(){
             const email = contact.email;
             if(regexEmail(email)){
-                erreurChampManquantVide('emailErrorMsg')
+                erreurChampManquant('emailErrorMsg',"")
                 return true;
             }else{
-                erreurChampManquant('emailErrorMsg')
+                erreurChampManquant('emailErrorMsg', "Ce champ est non valide")
                 return false;
             }
         };
@@ -254,10 +290,10 @@ document
         function addressControl(){
             const address = contact.address;
             if(regexAdresse(address)){
-                erreurChampManquantVide('addressErrorMsg')
+                erreurChampManquant('addressErrorMsg',"")
                 return true;
             }else{
-                erreurChampManquant('addressErrorMsg')
+                erreurChampManquant('addressErrorMsg', "Ce champ est non valide");
                 return false;
             }
         };
@@ -265,26 +301,27 @@ document
         function cityControl(){
             const ville = contact.city;
             if(regexLettre(ville)){
-                erreurChampManquantVide('cityErrorMsg')
+                erreurChampManquant('cityErrorMsg', "")
                 return true;
             }else{
-                erreurChampManquant('cityErrorMsg')
+                erreurChampManquant('cityErrorMsg', "Ce champ est non valide");
                 return false;
             }
         };
         ///Contrôle validité formulaire avant envoi dans localStorage
         if(lastNameControl() && firstNameControl() && emailControl() && addressControl() && cityControl()){
         //On appelle la fonction de POST
-        envoiPaquet()
+        console.log("v")
+        envoiPaquet(contact)
         }
 });
 
 //////////////////////Post//////////////////////
 
-async function envoiPaquet() {
+async function envoiPaquet(contact) {
     //on place les id des produits dans un tableau
     let products = [];
-    panier
+   
     panier.forEach(produits => {
         products.push(produits.id)
     })
