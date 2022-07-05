@@ -7,8 +7,6 @@
 }
 
 .confirmation {
-    background-image: url("../images/2Error404.webp");
-    background-size: cover;
     font-weight: 500;
     padding: 30px;
     border-radius: 25px;
@@ -30,4 +28,32 @@
     height: 6%;
     margin-left: 11%;
     text-decoration: none;
+    display: block ruby;
+    z-index: 1;
+}
+
+#erreur404 {
+    height: 80%;
+    position: absolute;
+    z-index: 0;
+}
+
+@media all and (max-width: 1280px) {
+    #erreur404 {
+        height: 45%;
+        width: 65%;
+    }
+}
+
+@media all and (max-width: 600px) {
+    .btn {
+        font-size: 15px;
+    }
+    .confirmation{
+        height: 300px;
+    }
+    #erreur404 {
+        height: 35%;
+        width: 65%;
+    }
 }
