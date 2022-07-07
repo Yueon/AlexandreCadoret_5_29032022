@@ -1,14 +1,14 @@
 // mettre les fonctions utiliser sûr plusieurs pages
 
-export function savePanier(panier){
+export function savePanier(panier) {
     localStorage.setItem("produits", JSON.stringify(panier));
 }
-          
-export function getPanier(){
+
+export function getPanier() {
     let panier = localStorage.getItem("produits");
-      if(panier == null){
+    if (panier == null) {
         return [];
-    } else{
+    } else {
         console.log('Il y a déjà des produits dans le localStrorage')
         return JSON.parse(panier);
     }

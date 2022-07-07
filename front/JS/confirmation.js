@@ -1,4 +1,4 @@
-function commande () {
+function commande() {
     sessionStorage.clear();
     localStorage.clear();
     let numcommande = new URLSearchParams(document.location.search).get("commande");

@@ -33,7 +33,7 @@
 }
 
 #erreur404 {
-    height: 80%;
+    height: 65%;
     position: absolute;
     z-index: 0;
 }
@@ -54,6 +54,5 @@
     }
     #erreur404 {
         height: 35%;
-        width: 65%;
     }
 }

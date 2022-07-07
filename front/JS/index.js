@@ -4,14 +4,14 @@ import { getProducts } from "./api.js";
 
 window.onload = async () => {
   const products = await getProducts()
-  if (products === undefined){
+  if (products === undefined) {
     return window.location.href = '404.html';
   }
   createElements(products)
 }
 //on affiche les canapés
-function createElements(products){
-  for(let produit of products){
+function createElements(products) {
+  for (let produit of products) {
     //On implémente le HTML
     const itemsHtml = document.getElementById('items');
     itemsHtml.innerHTML += `<a href ="./product.html?id=${produit._id}">
@@ -21,5 +21,5 @@ function createElements(products){
                                   <p class="productDescription">${produit.description}</p>
                               </article>
                             </a>`;
-                            }
+  }
 }
